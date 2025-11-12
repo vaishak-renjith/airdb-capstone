@@ -1,0 +1,167 @@
+﻿  server.cpp
+  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
+  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
+  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
+  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+C:\Users\vaish\source\repos\Project2\Project2\crow\http_parser_merged.h(587,32): warning C4244: '=': conversion from '__int64' to 'unsigned long', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\http_parser_merged.h(607,32): warning C4244: '=': conversion from '__int64' to 'unsigned long', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\json.h(1267,35): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\json.h(1749,32): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(180,33): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(199,48): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(201,53): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(201,53): warning C4267:         with
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(201,53): warning C4267:         [
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(201,53): warning C4267:             _Ty=int
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(201,53): warning C4267:         ]
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(302,94): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(450,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(461,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(479,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\mustache.h(490,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(905,70): warning C4244: 'argument': conversion from '__int64' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(926,70): warning C4244: 'argument': conversion from '__int64' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(947,70): warning C4244: 'argument': conversion from '__int64' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(969,61): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(985,61): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1000,61): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1055,53): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1066,45): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1319,118): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1319,87): warning C4267: 'argument': conversion from 'size_t' to 'uint16_t', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1325,135): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1386,111): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1530,24): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\routing.h(1546,24): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+  
+C:\Users\vaish\source\repos\Project2\Project2\airdb.h(8,42): warning C4099: 'crow::json::wvalue': type name first seen using 'class' now seen using 'struct'
+  (compiling source file 'server.cpp')
+      C:\Users\vaish\source\repos\Project2\Project2\crow\json.h(1290,15):
+      see declaration of 'crow::json::wvalue'
+  
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(155,26): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(224,26): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(235,47): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(304,25): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(375,75): warning C4244: 'argument': conversion from 'unsigned __int64' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+      C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(375,75):
+      the template instantiation context (the oldest one first) is
+          C:\Users\vaish\source\repos\Project2\Project2\server.cpp(46,21):
+          see reference to class template instantiation 'crow::Crow<>' being compiled
+          C:\Users\vaish\source\repos\Project2\Project2\crow\app.h(526,14):
+          while compiling class template member function 'void crow::Crow<>::run(void)'
+              C:\Users\vaish\source\repos\Project2\Project2\server.cpp(316,39):
+              see the first reference to 'crow::Crow<>::run' in 'main'
+          C:\Users\vaish\source\repos\Project2\Project2\crow\app.h(581,30):
+          see reference to class template instantiation 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>' being compiled
+          C:\Users\vaish\source\repos\Project2\Project2\crow\http_server.h(304,14):
+          while compiling class template member function 'void crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::do_accept(void)'
+              C:\Users\vaish\source\repos\Project2\Project2\crow\http_server.h(218,22):
+              see the first reference to 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::do_accept' in 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::run'
+              C:\Users\vaish\source\repos\Project2\Project2\crow\app.h(587,33):
+              see the first reference to 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::run' in 'crow::Crow<>::run'
+              C:\Users\vaish\source\repos\Project2\Project2\server.cpp(316,39):
+              see the first reference to 'crow::Crow<>::run' in 'main'
+          C:\Users\vaish\source\repos\Project2\Project2\crow\http_server.h(317,19):
+          see reference to class template instantiation 'crow::Connection<Adaptor,Handler>' being compiled
+          with
+          [
+              Adaptor=crow::SocketAdaptor,
+              Handler=crow::Crow<>
+          ]
+          C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(366,14):
+          while compiling class template member function 'void crow::Connection<Adaptor,Handler>::do_read(void)'
+          with
+          [
+              Adaptor=crow::SocketAdaptor,
+              Handler=crow::Crow<>
+          ]
+              C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(103,34):
+              see the first reference to 'crow::Connection<Adaptor,Handler>::do_read' in 'crow::Connection<Adaptor,Handler>::start::<lambda_1>::operator ()'
+          with
+          [
+              Adaptor=crow::SocketAdaptor,
+              Handler=crow::Crow<>
+          ]
+  
+C:\Users\vaish\source\repos\Project2\Project2\crow\parser.h(127,25): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'server.cpp')
+      C:\Users\vaish\source\repos\Project2\Project2\crow\parser.h(127,25):
+      the template instantiation context (the oldest one first) is
+          C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(493,32):
+          see reference to class template instantiation 'crow::HTTPParser<crow::Connection<Adaptor,Handler>>' being compiled
+          with
+          [
+              Adaptor=crow::SocketAdaptor,
+              Handler=crow::Crow<>
+          ]
+          C:\Users\vaish\source\repos\Project2\Project2\crow\parser.h(111,14):
+          while compiling class template member function 'bool crow::HTTPParser<crow::Connection<Adaptor,Handler>>::feed(const char *,int)'
+          with
+          [
+              Adaptor=crow::SocketAdaptor,
+              Handler=crow::Crow<>
+          ]
+              C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(375,32):
+              see the first reference to 'crow::HTTPParser<crow::Connection<Adaptor,Handler>>::feed' in 'crow::Connection<Adaptor,Handler>::do_read::<lambda_1>::operator ()'
+          with
+          [
+              Adaptor=crow::SocketAdaptor,
+              Handler=crow::Crow<>
+          ]
+  
+  Project2.vcxproj -> C:\Users\vaish\source\repos\Project2\x64\Debug\Project2.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.

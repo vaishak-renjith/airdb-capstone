@@ -1,0 +1,6 @@
+body { background:#fcfcf9; color:#13343b; }
+#map { height:320px; margin-top:10px; }
+/* improve datalist readability */
+input[list] { caret-color:#13343b; }
+
+#airline-suggest-panel { min-width: 240px; }
