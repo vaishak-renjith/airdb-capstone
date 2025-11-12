@@ -84,6 +84,9 @@ public:
     std::vector<std::pair<std::shared_ptr<Airport>, int>>
         GetAirportsWithinRadiusKm(double lat, double lon, double radius_km) const;
 
+    // Routes
+    const std::vector<Route>& GetAllRoutes() const;
+
 private:
     // parsing helpers used by loaders
     static std::vector<std::string> parseCSVLine(const std::string& line);

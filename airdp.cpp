@@ -86,6 +86,16 @@ std::vector<std::string> AirTravelDB::parseCSVLine(const std::string& line) {
     return fields;
 }
 
+static std::string csv_escape(const std::string& s) {
+    bool need_quotes = s.find_first_of(",\"\n\r") != std::string::npos;
+    if (!need_quotes) return s;
+    std::string out = "\"";
+    for (char c : s) out += (c == '"') ? "\"\"" : std::string(1, c);
+    out += "\"";
+    return out;
+}
+
+
 // ---------------- Loaders ----------------
 static inline int toInt(const std::string& s) {
     if (s.empty() || s == "\\N") return -1;
@@ -307,3 +317,5 @@ std::vector<Airport> AirTravelDB::GetAllAirports() const {
         });
     return out;
 }
+
+const std::vector<Route>& AirTravelDB::GetAllRoutes() const { return routes_; }

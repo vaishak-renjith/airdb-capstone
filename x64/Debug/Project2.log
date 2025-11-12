@@ -1,14 +1,14 @@
 ﻿  server.cpp
+  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
+  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
+  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
+  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
 C:\Users\vaish\source\repos\Project2\Project2\crow\http_parser_merged.h(587,32): warning C4244: '=': conversion from '__int64' to 'unsigned long', possible loss of data
   (compiling source file 'server.cpp')
   
 C:\Users\vaish\source\repos\Project2\Project2\crow\http_parser_merged.h(607,32): warning C4244: '=': conversion from '__int64' to 'unsigned long', possible loss of data
   (compiling source file 'server.cpp')
   
-  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
-  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
-  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
-  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
 C:\Users\vaish\source\repos\Project2\Project2\crow\json.h(1267,35): warning C4267: 'argument': conversion from 'size_t' to 'uint32_t', possible loss of data
   (compiling source file 'server.cpp')
   
@@ -90,19 +90,29 @@ C:\Users\vaish\source\repos\Project2\Project2\airdb.h(8,42): warning C4099: 'cro
       C:\Users\vaish\source\repos\Project2\Project2\crow\json.h(1290,15):
       see declaration of 'crow::json::wvalue'
   
-C:\Users\vaish\source\repos\Project2\Project2\server.cpp(155,26): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\vaish\source\repos\Project2\Project2\server.cpp(224,26): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\vaish\source\repos\Project2\Project2\server.cpp(235,47): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\vaish\source\repos\Project2\Project2\server.cpp(307,21): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(214,26): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(285,26): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(460,25): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(504,25): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(622,25): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(644,25): warning C4566: character represented by universal-character-name '\u2554' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(644,25): warning C4566: character represented by universal-character-name '\u2550' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(644,25): warning C4566: character represented by universal-character-name '\u2557' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(645,25): warning C4566: character represented by universal-character-name '\u2551' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(647,25): warning C4566: character represented by universal-character-name '\u2551' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(648,25): warning C4566: character represented by universal-character-name '\u255A' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(648,25): warning C4566: character represented by universal-character-name '\u2550' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(648,25): warning C4566: character represented by universal-character-name '\u255D' cannot be represented in the current code page (1252)
+C:\Users\vaish\source\repos\Project2\Project2\server.cpp(676,47): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
 C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(375,75): warning C4244: 'argument': conversion from 'unsigned __int64' to 'int', possible loss of data
   (compiling source file 'server.cpp')
       C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(375,75):
       the template instantiation context (the oldest one first) is
-          C:\Users\vaish\source\repos\Project2\Project2\server.cpp(46,21):
+          C:\Users\vaish\source\repos\Project2\Project2\server.cpp(82,21):
           see reference to class template instantiation 'crow::Crow<>' being compiled
           C:\Users\vaish\source\repos\Project2\Project2\crow\app.h(526,14):
           while compiling class template member function 'void crow::Crow<>::run(void)'
-              C:\Users\vaish\source\repos\Project2\Project2\server.cpp(320,39):
+              C:\Users\vaish\source\repos\Project2\Project2\server.cpp(714,39):
               see the first reference to 'crow::Crow<>::run' in 'main'
           C:\Users\vaish\source\repos\Project2\Project2\crow\app.h(581,30):
           see reference to class template instantiation 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>' being compiled
@@ -112,7 +122,7 @@ C:\Users\vaish\source\repos\Project2\Project2\crow\http_connection.h(375,75): wa
               see the first reference to 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::do_accept' in 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::run'
               C:\Users\vaish\source\repos\Project2\Project2\crow\app.h(587,33):
               see the first reference to 'crow::Server<crow::Crow<>,crow::TCPAcceptor,crow::SocketAdaptor>::run' in 'crow::Crow<>::run'
-              C:\Users\vaish\source\repos\Project2\Project2\server.cpp(320,39):
+              C:\Users\vaish\source\repos\Project2\Project2\server.cpp(714,39):
               see the first reference to 'crow::Crow<>::run' in 'main'
           C:\Users\vaish\source\repos\Project2\Project2\crow\http_server.h(317,19):
           see reference to class template instantiation 'crow::Connection<Adaptor,Handler>' being compiled

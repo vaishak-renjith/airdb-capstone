@@ -2,75 +2,626 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Air Travel Database</title>
+    <title>Air Travel Database - CIS 22C Capstone</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 2rem;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-top: 2rem;
+            padding: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+            .nav-tabs .nav-link.active {
+                color: #764ba2;
+                font-weight: 600;
+            }
+
+        .card {
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+            .btn-primary:hover {
+                opacity: 0.9;
+            }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+        }
+
+        .result-section {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .report-table {
+            font-size: 0.9rem;
+        }
+
+        .download-link {
+            margin-top: 0.5rem;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card {
+            transition: transform 0.2s;
+        }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+            }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Air Travel DB</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="#" id="nav-search">Search</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/code" target="_blank">Code</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
     <div class="container">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="card p-3">
-                    <h5>Airline / Airport Search</h5>
-                    <div class="mb-2">
-                        <select id="stype" class="form-select" aria-label="Search type">
-                            <option value="airline">Airline</option>
-                            <option value="airport">Airport</option>
-                        </select>
-                    </div>
-                    <div class="input-group mb-2">
-                        <input id="code" list="airline-suggest" class="form-control" placeholder="IATA (e.g., AA) or Name">
-                        <button id="searchBtn" class="btn btn-primary">Search</button>
-                    </div>
-                    <div id="status" class="small text-muted">Done</div>
-
-                    <!-- datalists for suggestions (populated by app.js) -->
-                    <datalist id="airline-suggest"></datalist>
-                    <datalist id="airport-suggest"></datalist>
-                </div>
-
-                <div class="card p-3 mt-3">
-                    <h5>One-hop search</h5>
-                    <div class="row">
-                        <div class="col">
-                            <input id="one-src" list="airport-suggest" class="form-control" placeholder="Source IATA (e.g., LAX)">
-                        </div>
-                        <div class="col">
-                            <input id="one-dst" list="airport-suggest" class="form-control" placeholder="Destination IATA (e.g., BOS)">
-                        </div>
-                    </div>
-                    <div class="mt-2">
-                        <button id="oneBtn" class="btn btn-success">Find One-hop</button>
-                    </div>
-                </div>
+        <div class="main-container">
+            <div class="text-center mb-4">
+                <h1 class="display-4">✈️ Air Travel Database</h1>
+                <p class="text-muted">CIS 22C Capstone Project - OpenFlights Data Explorer</p>
             </div>
 
-            <div class="col-md-6">
-                <div id="result" class="card p-3" style="min-height:300px; overflow:auto">
-                    <h5>Results</h5>
-                    <div id="resultBody" class="mt-2"></div>
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="lookup-tab" data-bs-toggle="tab" data-bs-target="#lookup" type="button">
+                        🔍 Entity Lookup
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button">
+                        📊 Reports
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="onehop-tab" data-bs-toggle="tab" data-bs-target="#onehop" type="button">
+                        🛫 One-Hop Routes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button">
+                        ℹ️ About
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="mainTabContent">
+
+                <!-- Entity Lookup Tab -->
+                <div class="tab-pane fade show active" id="lookup" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card feature-card p-4">
+                                <h5 class="card-title">🛩️ Airline / Airport Search</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Search Type</label>
+                                    <select id="stype" class="form-select">
+                                        <option value="airline">Airline</option>
+                                        <option value="airport">Airport</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Enter IATA Code or Name</label>
+                                    <input id="code" list="suggestions" class="form-control"
+                                           placeholder="e.g., AA, LAX, or American Airlines">
+                                    <datalist id="suggestions"></datalist>
+                                    <small class="text-muted">Try: AA, United, LAX, JFK, London</small>
+                                </div>
+                                <button id="searchBtn" class="btn btn-primary w-100">
+                                    <span class="spinner-border spinner-border-sm d-none" id="searchSpinner"></span>
+                                    Search
+                                </button>
+                                <div id="status" class="mt-2 text-center"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card p-4" style="min-height: 350px;">
+                                <h5>Results</h5>
+                                <div id="resultBody" class="result-section mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="map" class="card mt-3" style="height:320px;"></div>
+
+                <!-- Reports Tab -->
+                <div class="tab-pane fade" id="reports" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card feature-card p-3 mb-3">
+                                <h6>📋 Reports by Routes</h6>
+                                <div class="mb-2">
+                                    <label class="form-label small">Report Type</label>
+                                    <select id="reportType" class="form-select form-select-sm">
+                                        <option value="airline-airports">Airports by Airline</option>
+                                        <option value="airport-airlines">Airlines by Airport</option>
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small">IATA Code</label>
+                                    <input id="reportCode" class="form-control form-control-sm"
+                                           placeholder="e.g., AA or LAX">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small">Format</label>
+                                    <select id="reportFormat" class="form-select form-select-sm">
+                                        <option value="json">JSON (Display)</option>
+                                        <option value="csv">CSV (Download)</option>
+                                    </select>
+                                </div>
+                                <button id="generateReport" class="btn btn-primary btn-sm w-100">
+                                    Generate Report
+                                </button>
+                            </div>
+
+                            <div class="card feature-card p-3">
+                                <h6>📑 Full Entity Reports</h6>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="fetchFullReport('airlines')">
+                                        All Airlines (by IATA)
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="fetchFullReport('airports')">
+                                        All Airports (by IATA)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card p-4">
+                                <h5>Report Results</h5>
+                                <div id="reportResults" class="result-section mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- One-Hop Routes Tab -->
+                <div class="tab-pane fade" id="onehop" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="card feature-card p-4">
+                                <h5>🗺️ Find One-Hop Routes</h5>
+                                <p class="text-muted small">Find routes with exactly one connection</p>
+                                <div class="mb-3">
+                                    <label class="form-label">Source Airport (IATA)</label>
+                                    <input id="one-src" list="airport-suggest" class="form-control"
+                                           placeholder="e.g., LAX">
+                                    <datalist id="airport-suggest"></datalist>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Destination Airport (IATA)</label>
+                                    <input id="one-dst" list="airport-suggest" class="form-control"
+                                           placeholder="e.g., BOS">
+                                </div>
+                                <button id="oneBtn" class="btn btn-success w-100">
+                                    Find Routes
+                                </button>
+                                <div id="oneStatus" class="mt-2 text-center"></div>
+                            </div>
+                            <div id="map" class="card"></div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card p-4">
+                                <h5>One-Hop Route Results</h5>
+                                <div id="oneHopResults" class="result-section mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Tab -->
+                <div class="tab-pane fade" id="about" role="tabpanel">
+                    <div class="card p-4">
+                        <h2>About This Project</h2>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>📚 Project Information</h5>
+                                <p><strong>Course:</strong> CIS 22C - Data Structures</p>
+                                <p><strong>Project:</strong> Honor Cohort Capstone - Air Travel Database</p>
+                                <p><strong>Technology Stack:</strong></p>
+                                <ul>
+                                    <li>Backend: C++ with Crow web framework</li>
+                                    <li>Frontend: HTML, CSS, Bootstrap, JavaScript</li>
+                                    <li>Data: OpenFlights.org (Airlines, Airports, Routes)</li>
+                                </ul>
+                                <button class="btn btn-info" onclick="fetchStudentId()">
+                                    Get Student ID
+                                </button>
+                                <div id="studentIdResult" class="mt-2"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>🗂️ Data Structures Used</h5>
+                                <ul>
+                                    <li><strong>Hash Tables:</strong> std::unordered_map for O(1) lookups</li>
+                                    <li><strong>Vectors:</strong> std::vector for sequential storage</li>
+                                    <li><strong>Smart Pointers:</strong> std::shared_ptr for memory management</li>
+                                    <li><strong>Multiple Indexing:</strong> By IATA, ICAO, and ID</li>
+                                </ul>
+                                <h5 class="mt-3">📊 Dataset Statistics</h5>
+                                <ul>
+                                    <li>~6,000 Airlines worldwide</li>
+                                    <li>~7,000 Airports globally</li>
+                                    <li>~67,000 Flight Routes</li>
+                                </ul>
+                                <div class="mt-3">
+                                    <button class="btn btn-secondary btn-sm" onclick="viewSourceCode()">
+                                        💻 View Source Code
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/static/app.js"></script>
+    <script>
+        // Initialize map
+        let map;
+        try {
+        map = L.map('map').setView([20, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 10,
+        attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        } catch (e) {
+        console.log('Map initialization failed');
+        }
+
+        // Utility functions
+        const byId = (id) => document.getElementById(id);
+        const clearElement = (el) => el.innerHTML = '';
+
+        async function getJSON(url) {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.json();
+        }
+
+        function setStatus(elementId, msg, type = 'info') {
+        const el = byId(elementId);
+        if (!msg) {
+        el.innerHTML = '';
+        return;
+        }
+        const badgeClass = type === 'error' ? 'status-error' : 'status-success';
+        el.innerHTML = `<span class="status-badge ${badgeClass}">${msg}</span>`;
+        }
+
+        function renderJSON(data, targetId) {
+        const target = byId(targetId);
+        clearElement(target);
+        const pre = document.createElement('pre');
+        pre.textContent = JSON.stringify(data, null, 2);
+        target.appendChild(pre);
+        }
+
+        // Entity Lookup
+        byId('code').addEventListener('input', async () => {
+        const type = byId('stype').value;
+        const q = byId('code').value.trim();
+        const box = byId('suggestions');
+
+        if (!q) {
+        clearElement(box);
+        return;
+        }
+
+        try {
+        const endpoint = type === 'airline' ? '/api/airlines/suggest' : '/api/airports/suggest';
+        const data = await getJSON(`${endpoint}?q=${encodeURIComponent(q)}`);
+        clearElement(box);
+
+        (data.items || []).forEach(it => {
+        const opt = document.createElement('option');
+        if (type === 'airline') {
+        opt.value = it.iata || it.icao || it.name;
+        opt.label = `${it.name}${it.iata ? ` (${it.iata})` : ''}`;
+        } else {
+        opt.value = it.iata || it.icao || it.name;
+        opt.label = `${it.name} - ${it.city || ''} (${it.iata || it.icao})`;
+        }
+        box.appendChild(opt);
+        });
+        } catch (e) {
+        console.error('Suggestion error:', e);
+        }
+        });
+
+        byId('searchBtn').addEventListener('click', async () => {
+        const type = byId('stype').value;
+        const term = byId('code').value.trim();
+        const resultBody = byId('resultBody');
+
+        if (!term) {
+        setStatus('status', 'Please enter a search term', 'error');
+        return;
+        }
+
+        clearElement(resultBody);
+        setStatus('status', 'Searching...');
+
+        try {
+        const endpoint = type === 'airline' ? '/airline' : '/airport';
+        const data = await getJSON(`${endpoint}/${encodeURIComponent(term)}`);
+        renderJSON(data, 'resultBody');
+        setStatus('status', 'Found!', 'success');
+        } catch (err) {
+        setStatus('status', 'Not found', 'error');
+        resultBody.textContent = `Error: ${err.message}`;
+        }
+        });
+
+        // Reports
+        byId('generateReport').addEventListener('click', async () => {
+        const reportType = byId('reportType').value;
+        const code = byId('reportCode').value.trim().toUpperCase();
+        const format = byId('reportFormat').value;
+
+        if (!code) {
+        alert('Please enter an IATA code');
+        return;
+        }
+
+        let endpoint;
+        if (reportType === 'airline-airports') {
+        endpoint = `/report/airline/${code}/airports-by-routes.${format}`;
+        } else {
+        endpoint = `/report/airport/${code}/airlines-by-routes.${format}`;
+        }
+
+        try {
+        if (format === 'csv') {
+        // Download CSV
+        window.open(endpoint, '_blank');
+        } else {
+        // Display JSON
+        const data = await getJSON(endpoint);
+        const results = byId('reportResults');
+        clearElement(results);
+
+        // Create nice table display
+        const title = document.createElement('h6');
+        title.textContent = reportType === 'airline-airports'
+        ? `Airports for ${data.airline_name || code}`
+        : `Airlines for ${data.airport_name || code}`;
+        results.appendChild(title);
+
+        if (data.items && data.items.length > 0) {
+        const table = document.createElement('table');
+        table.className = 'table table-sm table-striped report-table';
+
+        const headers = reportType === 'airline-airports'
+        ? ['Airport IATA', 'Airport Name', 'Routes']
+        : ['Airline IATA', 'Airline Name', 'Routes'];
+
+        table.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
+
+        const tbody = document.createElement('tbody');
+        data.items.forEach(item => {
+        const tr = document.createElement('tr');
+        if (reportType === 'airline-airports') {
+        tr.innerHTML = `<td>${item.airport_iata}</td><td>${item.airport_name}</td><td>${item.routes_count}</td>`;
+        } else {
+        tr.innerHTML = `<td>${item.airline_iata}</td><td>${item.airline_name}</td><td>${item.routes_count}</td>`;
+        }
+        tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        results.appendChild(table);
+
+        // Add download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = endpoint.replace('.json', '.csv');
+        downloadLink.className = 'btn btn-sm btn-outline-secondary download-link';
+        downloadLink.textContent = '📥 Download as CSV';
+        downloadLink.target = '_blank';
+        results.appendChild(downloadLink);
+        } else {
+        results.innerHTML = '<p class="text-muted">No data found</p>';
+        }
+        }
+        } catch (err) {
+        alert('Error generating report: ' + err.message);
+        }
+        });
+
+        async function fetchFullReport(type) {
+        const results = byId('reportResults');
+        clearElement(results);
+        results.innerHTML = '<p class="text-muted">Loading...</p>';
+
+        try {
+        const data = await getJSON(`/report/${type}/by-iata.json`);
+        clearElement(results);
+
+        const title = document.createElement('h6');
+        title.textContent = `All ${type.charAt(0).toUpperCase() + type.slice(1)} (${data.length} total)`;
+        results.appendChild(title);
+
+        const pre = document.createElement('pre');
+        pre.style.maxHeight = '400px';
+        pre.textContent = JSON.stringify(data.slice(0, 50), null, 2);
+        results.appendChild(pre);
+
+        if (data.length > 50) {
+        const note = document.createElement('p');
+        note.className = 'text-muted small';
+        note.textContent = `Showing first 50 of ${data.length} entries`;
+        results.appendChild(note);
+        }
+
+        const downloadLink = document.createElement('a');
+        downloadLink.href = `/report/${type}/by-iata.csv`;
+        downloadLink.className = 'btn btn-sm btn-outline-secondary';
+        downloadLink.textContent = '📥 Download Full CSV';
+        downloadLink.target = '_blank';
+        results.appendChild(downloadLink);
+        } catch (err) {
+        results.innerHTML = `<p class="text-danger">Error: ${err.message}</p>`;
+        }
+        }
+
+        // One-Hop Routes
+        function attachAirportSuggest(inputEl) {
+        inputEl.addEventListener('input', async () => {
+        const q = inputEl.value.trim();
+        const box = byId('airport-suggest');
+
+        if (!q) {
+        clearElement(box);
+        return;
+        }
+
+        try {
+        const data = await getJSON(`/api/airports/suggest?q=${encodeURIComponent(q)}`);
+        clearElement(box);
+        (data.items || []).forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.iata || it.icao;
+        opt.label = `${it.name} - ${it.city || ''} (${it.iata})`;
+        box.appendChild(opt);
+        });
+        } catch (e) {
+        console.error('Suggestion error:', e);
+        }
+        });
+        }
+
+        attachAirportSuggest(byId('one-src'));
+        attachAirportSuggest(byId('one-dst'));
+
+        byId('oneBtn').addEventListener('click', async () => {
+        const src = byId('one-src').value.trim().toUpperCase();
+        const dst = byId('one-dst').value.trim().toUpperCase();
+        const results = byId('oneHopResults');
+
+        clearElement(results);
+
+        if (!src || !dst) {
+        setStatus('oneStatus', 'Enter both airports', 'error');
+        return;
+        }
+
+        if (src === dst) {
+        setStatus('oneStatus', 'Airports must be different', 'error');
+        return;
+        }
+
+        setStatus('oneStatus', 'Searching...');
+
+        try {
+        const data = await getJSON(`/onehop/${src}/${dst}`);
+
+        const header = document.createElement('h6');
+        header.textContent = `${src} → ${dst} (${data.length} routes found)`;
+        results.appendChild(header);
+
+        if (data.length === 0) {
+        results.innerHTML += '<p class="text-muted">No one-hop routes found</p>';
+        setStatus('oneStatus', 'No routes found', 'error');
+        return;
+        }
+
+        const table = document.createElement('table');
+        table.className = 'table table-sm table-striped';
+        table.innerHTML = `<thead><tr>
+        <th>#</th><th>Via</th><th>Airline 1</th><th>Airline 2</th><th>Miles</th>
+        </tr></thead>`;
+
+        const tbody = document.createElement('tbody');
+        data.forEach((r, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i + 1}</td><td>${r.via}</td><td>${r.leg1_airline}</td><td>${r.leg2_airline}</td><td>${r.total_miles}</td>`;
+        tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        results.appendChild(table);
+
+        setStatus('oneStatus', `Found ${data.length} routes`, 'success');
+        } catch (err) {
+        setStatus('oneStatus', 'Error', 'error');
+        results.innerHTML = `<p class="text-danger">Error: ${err.message}</p>`;
+        }
+        });
+
+        // Student ID (placeholder - implement your endpoint)
+        async function fetchStudentId() {
+        const result = byId('studentIdResult');
+        result.innerHTML = '<p class="mt-2"><strong>Student ID:</strong>20612701<br><strong>Name:</strong>Vaishak Renjith</p>';
+        // TODO: Implement /api/student-id endpoint in server.cpp
+        }
+
+        function viewSourceCode() {
+        try {
+        window.location.href = '/download/source';
+        } catch (err) {
+        alert('Unable to start the download. Please try again.');
+        }
+        }
+
+        // Make fetchFullReport available globally
+        window.fetchFullReport = fetchFullReport;
+        window.fetchStudentId = fetchStudentId;
+        window.viewSourceCode = viewSourceCode;
+    </script>
 </body>
 </html>
