@@ -238,73 +238,77 @@ int main() {
 
     // One-hop (two legs) with stops==0 on BOTH legs; ordered by total miles
     CROW_ROUTE(app, "/onehop/<string>/<string>")
-        ([&db](const std::string& src, const std::string& dst) {
-        auto src_ap = db.GetAirportByIATA(src);
-        auto dst_ap = db.GetAirportByIATA(dst);
-        if (!src_ap || !dst_ap) return not_found("Source or destination airport not found");
-
-        // First leg candidates: from src, 0-stops, not already dst
-        std::vector<Route> from_src;
-        {
-            auto routes = db.SearchRoutes(src); // cheap prefilter
-            for (const auto& r : routes) {
-                if (r.src_iata == src && r.dst_iata != dst && r.stops == 0) {
-                    from_src.push_back(r);
-                }
-            }
-        }
-
-        struct OneHopRoute {
-            std::string src_iata, via_iata, dst_iata;
-            std::string leg1_airline, leg2_airline;
-            int total_distance_miles;
-        };
-        std::vector<OneHopRoute> results;
-
-        for (const auto& leg1 : from_src) {
-            auto to_dst = db.GetRoutesFromTo(leg1.dst_iata, dst);
-            // Enforce 0-stop on second leg
-            to_dst.erase(std::remove_if(to_dst.begin(), to_dst.end(),
-                [](const Route& r) { return r.stops != 0; }), to_dst.end());
-            if (to_dst.empty()) continue;
-
-            auto via_ap = db.GetAirportByIATA(leg1.dst_iata);
-            if (!via_ap) continue;
-
-            double d1_km = db.CalculateDistanceKm(src_ap->latitude, src_ap->longitude,
-                via_ap->latitude, via_ap->longitude);
-            double d2_km = db.CalculateDistanceKm(via_ap->latitude, via_ap->longitude,
-                dst_ap->latitude, dst_ap->longitude);
-            int miles = static_cast<int>(std::lround((d1_km + d2_km) * 0.621371));
-
-            for (const auto& leg2 : to_dst) {
-                OneHopRoute oh{
-                    leg1.src_iata, leg1.dst_iata, leg2.dst_iata,
-                    leg1.airline_iata, leg2.airline_iata,
-                    miles
-                };
-                results.push_back(std::move(oh));
-            }
-        }
-
-        std::sort(results.begin(), results.end(),
-            [](const OneHopRoute& a, const OneHopRoute& b) {
-                return a.total_distance_miles < b.total_distance_miles;
-            });
-
+([&db](const std::string& src, const std::string& dst) -> crow::response {
+    // Disallow same src/dst — return empty JSON array
+    if (src == dst) {
         crow::json::wvalue arr = crow::json::wvalue::list();
-        for (const auto& r : results) {
-            crow::json::wvalue j;
-            j["src"] = r.src_iata;
-            j["via"] = r.via_iata;
-            j["dst"] = r.dst_iata;
-            j["leg1_airline"] = r.leg1_airline;
-            j["leg2_airline"] = r.leg2_airline;
-            j["total_miles"] = r.total_distance_miles;
-            arr[arr.size()] = std::move(j);
-        }
         return crow::response(arr);
-            });
+    }
+
+    auto src_ap = db.GetAirportByIATA(src);
+    auto dst_ap = db.GetAirportByIATA(dst);
+    if (!src_ap || !dst_ap) {
+        return not_found("Source or destination airport not found");
+    }
+
+    // First-leg candidates from src with 0 stops and not already dst
+    std::vector<Route> from_src;
+    {
+        auto routes = db.SearchRoutes(src);
+        for (const auto& r : routes) {
+            if (r.src_iata == src && r.dst_iata != dst && r.stops == 0) {
+                from_src.push_back(r);
+            }
+        }
+    }
+
+    struct OneHopRoute {
+        std::string src_iata, via_iata, dst_iata;
+        std::string leg1_airline, leg2_airline;
+        int total_distance_miles;
+    };
+    std::vector<OneHopRoute> results;
+
+    for (const auto& leg1 : from_src) {
+        auto to_dst = db.GetRoutesFromTo(leg1.dst_iata, dst);
+        to_dst.erase(std::remove_if(to_dst.begin(), to_dst.end(),
+                     [](const Route& r){ return r.stops != 0; }), to_dst.end());
+        if (to_dst.empty()) continue;
+
+        auto via_ap = db.GetAirportByIATA(leg1.dst_iata);
+        if (!via_ap) continue;
+
+        double d1_km = db.CalculateDistanceKm(src_ap->latitude, src_ap->longitude,
+                                              via_ap->latitude, via_ap->longitude);
+        double d2_km = db.CalculateDistanceKm(via_ap->latitude, via_ap->longitude,
+                                              dst_ap->latitude, dst_ap->longitude);
+        int miles = static_cast<int>(std::lround((d1_km + d2_km) * 0.621371));
+
+        for (const auto& leg2 : to_dst) {
+            results.push_back({leg1.src_iata, leg1.dst_iata, leg2.dst_iata,
+                               leg1.airline_iata, leg2.airline_iata, miles});
+        }
+    }
+
+    std::sort(results.begin(), results.end(),
+              [](const OneHopRoute& a, const OneHopRoute& b){
+                  return a.total_distance_miles < b.total_distance_miles;
+              });
+
+    crow::json::wvalue arr = crow::json::wvalue::list();
+    for (const auto& r : results) {
+        crow::json::wvalue j;
+        j["src"] = r.src_iata;
+        j["via"] = r.via_iata;
+        j["dst"] = r.dst_iata;
+        j["leg1_airline"] = r.leg1_airline;
+        j["leg2_airline"] = r.leg2_airline;
+        j["total_miles"] = r.total_distance_miles;
+        arr[arr.size()] = std::move(j);
+    }
+    return crow::response(arr);
+});
+
 
     // ---------- Misc ----------
     CROW_ROUTE(app, "/code")
