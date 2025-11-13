@@ -314,16 +314,33 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize map
-        let map;
+        // Initialize the Leaflet map only when the One-Hop tab becomes visible to avoid gray tiles.
+        let oneHopMap = null;
+        function ensureOneHopMap() {
+        if (!window.L) return;
         try {
-        map = L.map('map').setView([20, 0], 2);
+        if (!oneHopMap) {
+        oneHopMap = L.map('map').setView([20, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 10,
         attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-        } catch (e) {
-        console.log('Map initialization failed');
+        }).addTo(oneHopMap);
+        }
+        // Delay invalidateSize slightly so Bootstrap finishes its tab animations.
+        setTimeout(() => oneHopMap.invalidateSize(), 150);
+        } catch (err) {
+        console.warn('Map initialization failed', err);
+        }
+        }
+
+        const oneHopTabButton = document.querySelector('[data-bs-target="#onehop"]');
+        if (oneHopTabButton) {
+        oneHopTabButton.addEventListener('shown.bs.tab', ensureOneHopMap);
+        if (oneHopTabButton.classList.contains('active')) {
+        ensureOneHopMap();
+        }
+        } else {
+        ensureOneHopMap();
         }
 
         // Utility functions

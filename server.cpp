@@ -8,6 +8,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <array>
+#include <cstdint>
 
 #ifdef _WIN32
 #include <cstdlib>
@@ -30,30 +32,132 @@ static int read_port() {
 
 
 // ---------- helpers ----------
-static std::string read_file(const std::string& path) {
+static bool read_file_strict(const std::string& path, std::string& out) {
     std::ifstream f(path, std::ios::binary);
-    if (!f) return {};
+    if (!f) return false;
     std::ostringstream ss;
     ss << f.rdbuf();
-    return ss.str();
+    out = ss.str();
+    return true;
 }
 
-static std::string bundle_source_files(const std::vector<std::string>& files) {
-    std::ostringstream ss;
-    for (const auto& path : files) {
-        ss << "========== " << path << " ==========\n";
-        auto content = read_file(path);
-        if (content.empty()) {
-            ss << "[File missing or empty]\n\n";
-            continue;
+static std::string read_file(const std::string& path) {
+    std::string data;
+    if (!read_file_strict(path, data)) return {};
+    return data;
+}
+
+static std::array<uint32_t, 256> make_crc32_table() {
+    std::array<uint32_t, 256> table{};
+    for (uint32_t i = 0; i < 256; ++i) {
+        uint32_t c = i;
+        for (int j = 0; j < 8; ++j) {
+            if (c & 1) c = 0xEDB88320u ^ (c >> 1);
+            else c >>= 1;
         }
-        ss << content;
-        if (!content.empty() && content.back() != '\n') {
-            ss << '\n';
-        }
-        ss << '\n';
+        table[i] = c;
     }
-    return ss.str();
+    return table;
+}
+
+static uint32_t crc32(const std::string& data) {
+    static const auto table = make_crc32_table();
+    uint32_t crc = 0xFFFFFFFFu;
+    for (unsigned char ch : data) {
+        crc = table[(crc ^ ch) & 0xFF] ^ (crc >> 8);
+    }
+    return crc ^ 0xFFFFFFFFu;
+}
+
+static void write_le16(std::string& out, uint16_t value) {
+    out.push_back(static_cast<char>(value & 0xFF));
+    out.push_back(static_cast<char>((value >> 8) & 0xFF));
+}
+
+static void write_le32(std::string& out, uint32_t value) {
+    out.push_back(static_cast<char>(value & 0xFF));
+    out.push_back(static_cast<char>((value >> 8) & 0xFF));
+    out.push_back(static_cast<char>((value >> 16) & 0xFF));
+    out.push_back(static_cast<char>((value >> 24) & 0xFF));
+}
+
+struct ZipCentralEntry {
+    std::string name;
+    uint32_t crc;
+    uint32_t size;
+    uint32_t offset;
+};
+
+// Builds a minimal ZIP archive (stored entries only) directly in-memory so the
+// server can stream an attachment without touching disk.
+static std::string build_zip_from_files(const std::vector<std::string>& files) {
+    std::string zip;
+    std::vector<ZipCentralEntry> central_entries;
+    central_entries.reserve(files.size());
+
+    for (const auto& path : files) {
+        std::string data;
+        if (!read_file_strict(path, data)) {
+            return {};
+        }
+
+        const uint32_t offset = static_cast<uint32_t>(zip.size());
+        const uint32_t crc = crc32(data);
+        const uint32_t size = static_cast<uint32_t>(data.size());
+        const uint16_t name_len = static_cast<uint16_t>(path.size());
+
+        write_le32(zip, 0x04034b50);
+        write_le16(zip, 20);
+        write_le16(zip, 0);
+        write_le16(zip, 0);
+        write_le16(zip, 0);
+        write_le16(zip, 0);
+        write_le32(zip, crc);
+        write_le32(zip, size);
+        write_le32(zip, size);
+        write_le16(zip, name_len);
+        write_le16(zip, 0);
+        zip.append(path);
+        zip.append(data);
+
+        central_entries.push_back({ path, crc, size, offset });
+    }
+
+    const uint32_t central_dir_offset = static_cast<uint32_t>(zip.size());
+    std::string central_dir;
+    for (const auto& entry : central_entries) {
+        write_le32(central_dir, 0x02014b50);
+        write_le16(central_dir, 20);
+        write_le16(central_dir, 20);
+        write_le16(central_dir, 0);
+        write_le16(central_dir, 0);
+        write_le16(central_dir, 0);
+        write_le16(central_dir, 0);
+        write_le32(central_dir, entry.crc);
+        write_le32(central_dir, entry.size);
+        write_le32(central_dir, entry.size);
+        write_le16(central_dir, static_cast<uint16_t>(entry.name.size()));
+        write_le16(central_dir, 0);
+        write_le16(central_dir, 0);
+        write_le16(central_dir, 0);
+        write_le16(central_dir, 0);
+        write_le32(central_dir, 0);
+        write_le32(central_dir, entry.offset);
+        central_dir.append(entry.name);
+    }
+
+    zip.append(central_dir);
+
+    write_le32(zip, 0x06054b50);
+    write_le16(zip, 0);
+    write_le16(zip, 0);
+    write_le16(zip, static_cast<uint16_t>(central_entries.size()));
+    write_le16(zip, static_cast<uint16_t>(central_entries.size()));
+    write_le32(zip, static_cast<uint32_t>(central_dir.size()));
+    write_le32(zip, central_dir_offset);
+    write_le16(zip, 0);
+
+    return zip;
 }
 
 static crow::response not_found(const std::string& msg = "Not found") {
@@ -119,18 +223,19 @@ int main() {
         ([] {
         const std::vector<std::string> files = {
             "server.cpp",
+            "airdp.cpp",
             "airdb.h",
             "index.html",
             "style.css",
             "app.js"
         };
-        auto bundle = bundle_source_files(files);
-        if (bundle.empty()) {
-            return crow::response(500, "Source bundle unavailable");
+        auto zipped = build_zip_from_files(files);
+        if (zipped.empty()) {
+            return crow::response(500, "Source zip unavailable");
         }
-        crow::response res{ bundle };
-        res.add_header("Content-Type", "text/plain; charset=utf-8");
-        res.add_header("Content-Disposition", "attachment; filename=\"air-travel-source.txt\"");
+        crow::response res{ zipped };
+        res.add_header("Content-Type", "application/zip");
+        res.add_header("Content-Disposition", "attachment; filename=\"air-travel-source.zip\"");
         return res;
             });
 

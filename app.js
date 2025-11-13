@@ -19,18 +19,6 @@
 
   const resultBody = byId('resultBody');
 
-  // --- Map (optional visual)
-  let map;
-  try {
-    map = L.map('map').setView([20, 0], 2);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 8,
-      attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-  } catch (e) {
-    // If Leaflet isn't available, ignore map.
-  }
-
   // -------- Utilities --------
   function setStatus(msg) { statusEl.textContent = msg || ''; }
   function clearResults() { resultBody.innerHTML = ''; }
